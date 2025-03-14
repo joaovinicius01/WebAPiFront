@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Livro</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> <!-- Incluindo o axios -->
 </head>
 <body>
     <div class="container">
@@ -12,7 +13,7 @@
         <hr />
         <div class="row">
             <div class="col-md-4">
-                <form id="livroForm" method="POST" action="/livros/criar" onsubmit="adicionarLivro(event)">
+                <form id="livroForm" method="POST" action="CriarLivro.html" onsubmit="adicionarLivro(event)">
                     <div class="mb-3">
                         <label for="title" class="form-label">Título:</label>
                         <input type="text" id="title" name="titulo" class="form-control" required />
@@ -31,7 +32,7 @@
         </div>
 
         <div>
-            <a href="/livros">Voltar à lista de Livros</a>
+            <a href="ListLivro.html">Voltar à lista de Livros</a>
         </div>
     </div>
 
@@ -46,16 +47,14 @@
             const livroModel = { Titulo: titulo, Autor: autor };
 
             try {
-                const response = await fetch("https://localhost:7193/api/Livro/CriarLivro", {
-                    method: "POST",
+                const response = await axios.post("https://localhost:7193/api/Livro/CriarLivro", livroModel, {
                     headers: {
                         "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(livroModel)
+                    }
                 });
 
-                if (response.ok) {
-                    window.location.href = "/livros";
+                if (response.status === 200) {
+                    window.location.href = "ListLivro.html";
                 } else {
                     console.error("Erro ao adicionar livro: " + response.statusText);
                 }
