@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Livros</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">Lista de Livros</h1>
+        
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="livrosTable">
+                <tr>
+                    <td colspan="4" class="text-center">Carregando...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <a href="adicionar.html" class="btn btn-success">Adicionar Novo Livro</a>
+    </div>
+
+    <script>
+        async function carregarLivros() {
+            try {
+                const response = await axios.get("https://localhost:7193/api/Livro");
+                const livros = response.data;
+                
+                const tabela = document.getElementById("livrosTable");
+                tabela.innerHTML = ""; // Limpa a tabela antes de inserir os dados
+
+                if (livros.length === 0) {
+                    tabela.innerHTML = '<tr><td colspan="4" class="text-center">Nenhum livro encontrado.</td></tr>';
+                    return;
+                }
+
+                livros.forEach(livro => {
+                    const row = document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${livro.Id}</td>
+                        <td>${livro.Titulo}</td>
+                        <td>${livro.Autor}</td>
+                        <td>
+                            <a href="editar.html?id=${livro.Id}" class="btn btn-primary btn-sm">Editar</a>
+                            <button class="btn btn-danger btn-sm" onclick="excluirLivro(${livro.Id})">Deletar</button>
+                        </td>
+                    `;
+
+                    tabela.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error("Erro ao carregar livros:", error);
+                document.getElementById("livrosTable").innerHTML = '<tr><td colspan="4" class="text-center text-danger">Erro ao carregar dados.</td></tr>';
+            }
+        }
+
+        async function excluirLivro(id) {
+            if (!confirm("Tem certeza de que deseja excluir este livro?")) return;
+
+            try {
+                await axios.delete(`https://localhost:7193/api/Livro/${id}`);
+                alert("Livro excluído com sucesso!");
+                carregarLivros(); // Recarrega a lista após excluir
+            } catch (error) {
+                console.error("Erro ao excluir livro:", error);
+                alert("Erro ao excluir livro.");
+            }
+        }
+
+        window.onload = carregarLivros;
+    </script>
+</body>
+</html>
